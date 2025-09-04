@@ -1,38 +1,62 @@
-import React from "react";
+import React, { useState } from "react";
+import { diffWords } from "diff";
 import enagramlogo from "./images/enagramlogo.svg";
 
 const Home = () => {
+  const [text1, setText1] = useState("");
+  const [text2, setText2] = useState("");
+  const [diffResult, setDiffResult] = useState(null);
+  const [activeMenu, setActiveMenu] = useState("ტექსტის შედარება");
+
+  const handleCompare = () => {
+    const result = diffWords(text1, text2);
+    setDiffResult(result);
+  };
+
+  const menuItems = [
+    "მართლმწერი",
+    "ტექსტის შედარება",
+    "ხმა → ტექსტი",
+    "ტექსტი → ხმა",
+    "PDF კონვერტაცია",
+  ];
+
   return (
     <section className="flex h-screen">
-      <aside className="w-60 bg-[#0b2a5a] text-white flex flex-col gap-y-[50px] pl-[24px] pt-[45px]">
-        <article className="flex gap-x-[10px] items-center">
-          <img src={enagramlogo} alt="" />
-          <h2 className="p-4 text-lg font-bold">ENAGRAM</h2>
-        </article>
-        <nav className="flex-1 flex flex-col gap-y-[28px]">
-          <ul className="space-y-2 px-4 text-sm flex flex-col gap-y-[34px]">
-            <li className="hover:bg-white/10 rounded px-2 py-2 cursor-pointer">
-              მართლმწერი
-            </li>
-            <li className="hover:bg-white/10 rounded px-2 py-2 cursor-pointer">
-              ტექსტის შედარება
-            </li>
-          </ul>
-          <ul className="space-y-2 px-4 text-sm flex flex-col gap-y-[28px]">
-            <li className="hover:bg-white/10 rounded px-2 py-2 cursor-pointer">
-              ხმა → ტექსტი
-            </li>
-            <li className="hover:bg-white/10 rounded px-2 py-2 cursor-pointer">
-              ტექსტი → ხმა
-            </li>
-            <li className="hover:bg-white/10 rounded px-2 py-2 cursor-pointer">
-              PDF კონვერტაცია
-            </li>
+      <aside className="w-64 bg-[#0b2a5a] text-white flex flex-col pt-10">
+        <div className="flex items-center gap-3 px-6 mb-10">
+          <img src={enagramlogo} alt="logo" />
+          <h2 className="text-lg font-bold">ENAGRAM</h2>
+        </div>
+
+        <nav className="flex-1 flex flex-col gap-y-6">
+          <ul className="flex flex-col gap-y-2">
+            {menuItems.map((item) => (
+              <li
+                key={item}
+                onClick={() => setActiveMenu(item)}
+                className="relative px-4 py-2 cursor-pointer"
+              >
+                {activeMenu === item && (
+                  <div className="absolute inset-y-0 left-0 w-[90%] rounded-r-full bg-white"></div>
+                )}
+                <span
+                  className={`relative z-10 ${
+                    activeMenu === item
+                      ? "text-[#0b2a5a] font-medium"
+                      : "text-white"
+                  }`}
+                >
+                  {item}
+                </span>
+              </li>
+            ))}
           </ul>
         </nav>
-        <span className="p-4 border-t border-white/20 text-xs">
+
+        <div className="mt-auto px-6 py-4 border-t border-white/20 text-xs">
           თამარ ონიანი
-        </span>
+        </div>
       </aside>
 
       <section className="flex flex-col flex-1">
@@ -49,9 +73,12 @@ const Home = () => {
             + ახლის დამატება
           </button>
         </header>
+
         <section className="flex flex-col gap-y-[32px]">
           <main className="flex flex-1 p-6 gap-4 bg-gray-50">
             <textarea
+              value={text1}
+              onChange={(e) => setText1(e.target.value)}
               className="flex-1 p-4 h-[542px] rounded-lg bg-blue-50 resize-none focus:outline-none"
               placeholder="დაიწყე წერა..."
             />
@@ -59,15 +86,54 @@ const Home = () => {
               <span className="text-gray-400 text-2xl">⇔</span>
             </div>
             <textarea
+              value={text2}
+              onChange={(e) => setText2(e.target.value)}
               className="flex-1 p-4 h-[542px] rounded-lg bg-blue-50 resize-none focus:outline-none"
               placeholder="დაიწყე წერა..."
             />
           </main>
+
           <article className="flex justify-center">
-            <button className="w-[142px] bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-md text-center">
-              გადატანა
+            <button
+              onClick={handleCompare}
+              className="w-[142px] bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-md text-center"
+            >
+              შედარება
             </button>
           </article>
+
+          {diffResult && (
+            <article className="p-6">
+              <h3 className="font-semibold mb-4">შედარების შედეგი:</h3>
+              <article className="grid grid-cols-2 gap-6">
+                <article className="border rounded p-4 bg-white leading-relaxed">
+                  {diffResult.map((part, index) => {
+                    let style = "";
+                    if (part.removed) style = "text-red-600 line-through";
+                    if (!part.removed && !part.added) style = "text-gray-800";
+                    return (
+                      <span key={index} className={style}>
+                        {part.value}
+                      </span>
+                    );
+                  })}
+                </article>
+
+                <article className="border rounded p-4 bg-white leading-relaxed">
+                  {diffResult.map((part, index) => {
+                    let style = "";
+                    if (part.added) style = "text-green-600";
+                    if (!part.added && !part.removed) style = "text-gray-800";
+                    return (
+                      <span key={index} className={style}>
+                        {part.value}
+                      </span>
+                    );
+                  })}
+                </article>
+              </article>
+            </article>
+          )}
         </section>
       </section>
     </section>
