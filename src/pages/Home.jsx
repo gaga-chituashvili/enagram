@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { diffWords } from "diff";
-import { FiMenu, FiX } from "react-icons/fi";
 import enagramlogo from "./images/enagramlogo.svg";
+import checkIcon from "./images/check.svg";
+import spellingIcon from "./images/Spelling.svg";
+import aligncenterIcon from "./images/aligncenter.svg";
+import micIcon from "./images/mic.svg";
+import programmingIcon from "./images/programming.svg";
+import { FiMenu, FiX } from "react-icons/fi";
 
 const Home = () => {
   const [text1, setText1] = useState("");
@@ -16,12 +21,40 @@ const Home = () => {
   };
 
   const menuItems = [
-    "მართლმწერი",
-    "ტექსტის შედარება",
-    "ხმა → ტექსტი",
-    "ტექსტი → ხმა",
-    "PDF კონვერტაცია",
+    { label: "მართლმწერი", icon: checkIcon },
+    { label: "ტექსტის შედარება", icon: spellingIcon },
+    { label: "ხმა → ტექსტი", icon: micIcon },
+    { label: "PDF კონვერტაცია", icon: aligncenterIcon },
+    { label: "ტექსტი → ხმა", icon: programmingIcon },
   ];
+
+  const renderMenuItem = (item) => (
+    <li
+      key={item.label}
+      onClick={() => setActiveMenu(item.label)}
+      className="relative px-4 py-2 cursor-pointer flex items-center gap-2"
+    >
+      {activeMenu === item.label && (
+        <article className="absolute inset-y-0 left-0 w-[90%] rounded-r-full bg-white"></article>
+      )}
+      <img
+        src={item.icon}
+        alt={item.label}
+        className={`w-5 h-5 relative z-10 ${
+          activeMenu === item.label ? "filter brightness-0" : "opacity-70"
+        }`}
+      />
+      <span
+        className={`relative z-10 ${
+          activeMenu === item.label
+            ? "text-[#0b2a5a] font-medium"
+            : "text-white"
+        }`}
+      >
+        {item.label}
+      </span>
+    </li>
+  );
 
   return (
     <section className="flex h-screen bg-gray-50">
@@ -33,26 +66,7 @@ const Home = () => {
 
         <nav className="flex-1 flex flex-col gap-y-6">
           <ul className="flex flex-col gap-y-2">
-            {menuItems.map((item) => (
-              <li
-                key={item}
-                onClick={() => setActiveMenu(item)}
-                className="relative px-4 py-2 cursor-pointer"
-              >
-                {activeMenu === item && (
-                  <article className="absolute inset-y-0 left-0 w-[90%] rounded-r-full bg-white"></article>
-                )}
-                <span
-                  className={`relative z-10 ${
-                    activeMenu === item
-                      ? "text-[#0b2a5a] font-medium"
-                      : "text-white"
-                  }`}
-                >
-                  {item}
-                </span>
-              </li>
-            ))}
+            {menuItems.map(renderMenuItem)}
           </ul>
         </nav>
 
@@ -80,24 +94,33 @@ const Home = () => {
               <ul className="flex flex-col gap-y-2">
                 {menuItems.map((item) => (
                   <li
-                    key={item}
+                    key={item.label}
                     onClick={() => {
-                      setActiveMenu(item);
+                      setActiveMenu(item.label);
                       setSidebarOpen(false);
                     }}
-                    className="relative px-4 py-2 cursor-pointer"
+                    className="relative px-4 py-2 cursor-pointer flex items-center gap-2"
                   >
-                    {activeMenu === item && (
+                    {activeMenu === item.label && (
                       <article className="absolute inset-y-0 left-0 w-[90%] rounded-r-full bg-white"></article>
                     )}
+                    <img
+                      src={item.icon}
+                      alt={item.label}
+                      className={`w-5 h-5 relative z-10 ${
+                        activeMenu === item.label
+                          ? "filter brightness-0"
+                          : "bg-white"
+                      }`}
+                    />
                     <span
                       className={`relative z-10 ${
-                        activeMenu === item
+                        activeMenu === item.label
                           ? "text-[#0b2a5a] font-medium"
                           : "text-white"
                       }`}
                     >
-                      {item}
+                      {item.label}
                     </span>
                   </li>
                 ))}
